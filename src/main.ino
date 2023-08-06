@@ -12,10 +12,10 @@
 #define COLOR_JUMP        CRGB::White;
 #define COLOR_FIN         CRGB::Orange;
 #define COLOR_RESET       CRGB::Coral;
+#define COLOR_EMPTY       CRGB::Black
 // #define COLOR_BLOCKER     CRGB::Red
 // #define COLOR_TRIGGER_ONE CRGB::White
 // #define COLOR_TRIGGER_TWO CRGB::Magenta
-#define COLOR_EMPTY       CRGB::Black
 #define DELAY_TIMER       200
 
 CRGB leds[NUM_LEDS];
@@ -78,7 +78,14 @@ void  correct_position() {
   playerPosition = playerPosition % NUM_LEDS;
 }
 
-void    action(int position, instruction action, int target) {
+
+bool    action(int position, instruction action, int target, int playerColor) {
+  if (playerColor != 0 && levelHandler.getCurrentPlayer() != 0 && playerColor != levelHandler.getCurrentPlayer()) {
+      playerPosition = target;
+      leds[position] = COLOR_EMPTY; // todo consider removal
+      leds[target] = COLOR_PLAYER_1; // todo fix color
+    return false;
+  }
   playerPosition = target;
   switch(action) {
       case JUMP:
@@ -93,6 +100,7 @@ void    action(int position, instruction action, int target) {
         break;
   }
   FastLED.show();
+  return true;
 }
 
 void  mapMap() {
@@ -131,6 +139,7 @@ void loop() {
       move_player(first);
       move_player(first);
       playerOneMoved = true;
+      levelHandler.setPlayer(1);
       break;
     case ('s'):
       if (playerTwoMoved)
@@ -139,6 +148,7 @@ void loop() {
       move_player(second);
       move_player(second);
       playerTwoMoved = true;
+      levelHandler.setPlayer(2);
       break;
     case ('d'):
       if (playerThreeMoved)
@@ -147,6 +157,7 @@ void loop() {
       move_player(third);
       move_player(third);
       playerThreeMoved = true;
+      levelHandler.setPlayer(3);
       break;
     }
 

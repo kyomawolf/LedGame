@@ -7,43 +7,24 @@ extern bool playerOneMoved;
 extern bool playerTwoMoved;
 extern bool playerThreeMoved;
 
-Level getLevelOne() {
-    return {
-        std::make_tuple(3, FIN, 0), 
-        std::make_tuple(15, JUMP, 12)
-    };
-}
-
-Level getLevelTwo() {
-    return {
-        std::make_tuple(6, FIN, 0), 
-        std::make_tuple(15, JUMP, 12)
-    };
-}
-
-
-Level getLevelThree() {
-    return {
-        std::make_tuple(9, FIN, 0), 
-        std::make_tuple(15, JUMP, 12)
-    };
-}
 
 LevelManager::LevelManager() : currentLevel(0) {
-    levelList.push_back(getLevelOne());
-    levelList.push_back(getLevelTwo());
+    levelList = cursedLevelCreator();
     maxLevel = levelList.size();
 }
 
 void    LevelManager::finished(bool playedThrough) {
     //show score green or red (true | false)
+    playerOneMoved = false;
+    playerTwoMoved = false;
+    playerThreeMoved = false;
 }
 
 void    LevelManager::callToAction() {
     for (auto & idx : levelList[currentLevel]) {
         if (std::get<0>(idx) == playerPosition) {
-            action(std::get<0>(idx), std::get<1>(idx), std::get<2>(idx));
-            if (std::get<1>(idx) == FIN) {
+            bool ret = action(std::get<0>(idx), std::get<1>(idx), std::get<2>(idx), std::get<3>(idx));
+            if (ret && std::get<1>(idx) == FIN) {
                 currentLevel++;
                 std::cout << "finished! Next Level: " << currentLevel << std::endl;
                 playerOneMoved = false;
@@ -67,4 +48,12 @@ void    LevelManager::callToAction() {
 
 Level LevelManager::getLevel() {
     return levelList[currentLevel];
+}
+
+int LevelManager::getCurrentPlayer() {
+  return currentPlayer;
+}
+
+void    LevelManager::setPlayer(int id) {
+    currentPlayer = id;
 }
