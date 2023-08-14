@@ -1,6 +1,7 @@
 #pragma once
-
+#include <FastLED.h>
 #include <vector>
+#include "defs.h"
 
 enum instruction { JUMP, FIN, RESET };
 
@@ -19,14 +20,25 @@ std::vector<Level> cursedLevelCreator();
 class LevelManager {
 public:
     LevelManager();
-    void    callToAction();
-    Level   getLevel();
-    void    finished(bool playedThrough);
-    int     getCurrentPlayer();
-    void    setPlayer(int id);
+    void    generateNextLevel();
+    void    triggered(int playerColor);
+    void    playAnimation(CRGB* ledStrip);
+    
+    CRGB     randomColor(bool first, bool second, bool third);
+    void    setPressed(int player);
 private:
-    int currentLevel;
-    int maxLevel;
-    std::vector<Level> levelList;
-    int currentPlayer;
+    long score;
+    int points;
+    long level;
+    CRGB nextColor;
+    CRGB currentColor;
+    CRGB previousColor;
+    int colorPosition;
+    float difficulty;
+    float difficultyFactor;
+    std::vector<int> catchArea = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    bool playerOnePressed;
+    bool playerTwoPressed;
+    bool playerThreePressed;
+
 };

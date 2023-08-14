@@ -11,5 +11,5 @@ public:
 private:
     CRGB ledBar[NUM_LEDS];
     int playerPosition;
-
+    
 };

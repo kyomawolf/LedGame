@@ -8,52 +8,72 @@ extern bool playerTwoMoved;
 extern bool playerThreeMoved;
 
 
-LevelManager::LevelManager() : currentLevel(0) {
-    levelList = cursedLevelCreator();
-    maxLevel = levelList.size();
+void gameOver() {}
+
+LevelManager::LevelManager() : level(0) {
 }
 
-void    LevelManager::finished(bool playedThrough) {
-    //show score green or red (true | false)
-    playerOneMoved = false;
-    playerTwoMoved = false;
-    playerThreeMoved = false;
-}
-
-void    LevelManager::callToAction() {
-    for (auto & idx : levelList[currentLevel]) {
-        if (std::get<0>(idx) == playerPosition) {
-            bool ret = action(std::get<0>(idx), std::get<1>(idx), std::get<2>(idx), std::get<3>(idx));
-            if (ret && std::get<1>(idx) == FIN) {
-                currentLevel++;
-                std::cout << "finished! Next Level: " << currentLevel << std::endl;
-                playerOneMoved = false;
-                playerTwoMoved = false;
-                playerThreeMoved = false;
-                break; //todo consider removing this; if the player can land on finished and be teleported away afterward... well see
-            }
+void LevelManager::playAnimation(CRGB* ledStrip) {
+    CRGB localCatchColor = COLOR_CATCH;
+    bool maybeCatched = false;
+    if (playerOnePressed)
+        localCatchColor = COLOR_PLAYER_1;
+    else if (playerTwoPressed)
+        localCatchColor = COLOR_PLAYER_2;
+    else if(playerThreeMoved)
+        localCatchColor = COLOR_PLAYER_3;
+    for (auto& idx : catchArea) {
+        ledStrip[idx] = localCatchColor;
+        if (colorPosition == idx)
+            maybeCatched = true;
+    }
+    if (maybeCatched) {
+        if (int(playerOnePressed) + int(playerTwoPressed) + int(playerThreePressed) > 1) {
+            gameOver();
+            return;
         }
+        level++;
+        generateNextLevel();
     }
-    if (currentLevel == maxLevel) {
-        finished(true);
-        currentLevel = 0;
-        resetLeds();
-    }
-    else if (playerOneMoved && playerTwoMoved && playerThreeMoved) {
-        finished(false);
-        currentLevel = 0;
-        resetLeds();
-    }
+    ledStrip[colorPosition] = currentColor;
+    playerOnePressed = false;
+    playerTwoPressed = false;
+    playerThreePressed = false;
 }
 
-Level LevelManager::getLevel() {
-    return levelList[currentLevel];
-}
+void    LevelManager::setPressed(int player) {
+    switch (player) {
+        case 1:
+            playerOnePressed = true;
+            break;
+        case 2:
+            playerTwoPressed = true;
+            break;
+        case 3:
+            playerThreePressed = true;
+            break;
+        default:
+            break;
+    }
+ }
 
-int LevelManager::getCurrentPlayer() {
-  return currentPlayer;
-}
+void LevelManager::generateNextLevel() {
+    if (level < 3) {
+        switch(level) {
+            case 0:
+                previousColor = COLOR_EMPTY;
+                currentColor = randomColor(1, 1, 1);
+                points = 3;
+                break;
+            case 1:
+                points = 3;
+                break;
+            case 2:
+                points = 3;
+                break;
 
-void    LevelManager::setPlayer(int id) {
-    currentPlayer = id;
+        }
+    } else {
+        // todo generate procedural
+    }
 }
