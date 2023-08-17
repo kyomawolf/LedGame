@@ -5,6 +5,8 @@
 #include "Level.hh"
 #include "defs.h"
 
+//#define HARDWARE_INPUT
+
 CRGB leds[NUM_LEDS];
 int playerPosition = 0;
 int currentLevel = 0;
@@ -111,23 +113,50 @@ void  correct_position() {
 //   leds[playerPosition] = COLOR_PLAYER_0;
 // }
 
-void loop() {
+void serialFlush() {
+  while(Serial.available() > 0) {
+    char t = Serial.read();
+  }
+}
 
-  if (digitalRead(PIN_PLAYER_3) == LOW)
-    for (int i = 0; i < NUM_LEDS; i++) {leds[i] = COLOR_PLAYER_3;}
-  else if (Serial.available() > 0 && Serial.read() == 'a')
-    for (int i = 0; i < NUM_LEDS; i++) {leds[i] = COLOR_PLAYER_3;}
-  else
-    for (int i = 0; i < NUM_LEDS; i++) {leds[i] = COLOR_EMPTY;}
-  
+void loop() {
+  if (Serial.available() > 0) {
+  auto serialIn = Serial.read();
+  if (serialIn == 'a') {
+    levelHandler.setPressed(1);
+    // for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_1; }
+  }
+  else if (serialIn == 's') {
+    levelHandler.setPressed(2);
+    // for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_2; }
+  }
+  else if (serialIn == 'd') {
+    levelHandler.setPressed(3);
+    // for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_3; }
+  }
+  else;
+    // for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_EMPTY; }
+  }
+#ifdef HARDWARE_INPUT
+   else if (digitalRead(PIN_PLAYER_1) == LOW)
+    for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_1; }
+  else if (digitalRead(PIN_PLAYER_2) == LOW)
+    for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_2; }
+  else if (digitalRead(PIN_PLAYER_3) == LOW)
+    for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_3; }
+#endif
+  // else
+  //   for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_EMPTY; }
   // mapMap();
   FastLED.show();
-
+  delay(100);
   unsigned long currTime = millis();
-  if (currTime - lastTime == 600)
+  if (currTime - lastTime > 200) {
     levelHandler.playAnimation(leds);
+    lastTime = currTime;
+  }
   FastLED.show();
-  lastTime = currTime;
+  //serialFlush();
   // while (Serial.available() > 0) {
   //   int in = Serial.read();
   //   // Serial.write(in);
