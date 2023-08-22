@@ -4,8 +4,9 @@
 #include <FastLED.h>
 #include "Level.hh"
 #include "defs.h"
+#include "errno.h"
 
-//#define HARDWARE_INPUT
+#define HARDWARE_INPUT
 
 CRGB leds[NUM_LEDS];
 int playerPosition = 0;
@@ -27,6 +28,9 @@ void setup()
   FastLED.setBrightness(  BRIGHTNESS );
   Serial.begin(115200);
   delay(1000);
+  pinMode(PIN_PLAYER_1, INPUT_PULLUP);
+  pinMode(PIN_PLAYER_2, INPUT_PULLUP);
+  pinMode(PIN_PLAYER_3, INPUT_PULLUP);
   // Serial.print("hello player one!\n");
   // leds[playerPosition] = COLOR_PLAYER_1;
   // leds[12] = CRGB::Blue;
@@ -120,41 +124,44 @@ void serialFlush() {
 }
 
 void loop() {
-  if (Serial.available() > 0) {
-  auto serialIn = Serial.read();
-  if (serialIn == 'a') {
-    levelHandler.setPressed(1);
-    // for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_1; }
-  }
-  else if (serialIn == 's') {
-    levelHandler.setPressed(2);
-    // for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_2; }
-  }
-  else if (serialIn == 'd') {
-    levelHandler.setPressed(3);
-    // for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_3; }
-  }
-  else;
-    // for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_EMPTY; }
-  }
+  // if (Serial.available() > 0) {
+  // auto serialIn = Serial.read();
+  // if (serialIn == 'a') {
+  //   levelHandler.setPressed(1);
+  //   // for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_1; }
+  // }
+  // else if (serialIn == 's') {
+  //   levelHandler.setPressed(2);
+  //   // for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_2; }
+  // }
+  // else if (serialIn == 'd') {
+  //   levelHandler.setPressed(3);
+  //   // for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_3; }
+  // }
+  // else;
+  //   // for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_EMPTY; }
+  // }
 #ifdef HARDWARE_INPUT
-   else if (digitalRead(PIN_PLAYER_1) == LOW)
-    for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_1; }
+  if (digitalRead(PIN_PLAYER_1) == LOW)
+     {levelHandler.setPressed(1); Serial.write("one"); Serial.write(std::to_string(errno).c_str()); }
   else if (digitalRead(PIN_PLAYER_2) == LOW)
-    for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_2; }
-  else if (digitalRead(PIN_PLAYER_3) == LOW)
-    for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_3; }
+      {levelHandler.setPressed(2);  Serial.write("two"); }
+   else if (digitalRead(PIN_PLAYER_3) == LOW)
+     { levelHandler.setPressed(3); Serial.write("three"); }
 #endif
   // else
   //   for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_EMPTY; }
   // mapMap();
   FastLED.show();
-  delay(100);
-  unsigned long currTime = millis();
-  if (currTime - lastTime > 200) {
-    levelHandler.playAnimation(leds);
-    lastTime = currTime;
-  }
+  if (levelHandler.speed() < 6)
+    delay(6);
+  else
+    delay(levelHandler.speed());
+  // unsigned long currTime = millis();
+  // if (currTime - lastTime > levelHandler.speed()) {
+  levelHandler.playAnimation(leds);
+  // lastTime = currTime;
+  // }
   FastLED.show();
   //serialFlush();
   // while (Serial.available() > 0) {

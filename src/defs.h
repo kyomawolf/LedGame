@@ -17,6 +17,7 @@
 #define COLOR_RESET       CRGB::Coral
 #define COLOR_EMPTY       CRGB::Black
 #define COLOR_CATCH       CRGB::White
+#define DELAY_SHORT       60
 #define DELAY_TIMER       200
 
 #endif //DEFINE_VALUES_H

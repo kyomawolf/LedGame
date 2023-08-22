@@ -3,20 +3,6 @@
 #include <vector>
 #include "defs.h"
 
-enum instruction { JUMP, FIN, RESET };
-
-bool    action(int position, instruction action, int target, int playerColor);
-void    resetLeds();
-
-/* tuple for one action:
-    first int: position of instruction
-    second instruction: what is going to happen
-    third int: where to 
-    fourth int: who can trigger this instruction
-*/
-typedef std::vector< std::tuple<int, instruction, int, int> >  Level;
-std::vector<Level> cursedLevelCreator();
-
 class LevelManager {
 public:
     LevelManager();
@@ -26,10 +12,16 @@ public:
 
     int randomColor();
     
-    CRGB     randomColor(bool first, bool second, bool third);
+    CRGB    randomColor(bool first, bool second, bool third);
+    void     randomCatch();
     void    setPressed(int player);
-    void    gameOver();
+    void    gameOver(CRGB* ledStrip);
     void    clear(CRGB* ledStrip);
+    int     moveColor(CRGB* ledStrip);
+    unsigned long speed();
+    int     randomColor2();
+    void    randomDelay();
+    bool    catchedMaybe(CRGB* ledStrip, int color);
 private:
     long score;
     int points;
@@ -38,6 +30,11 @@ private:
     CRGB currentColor;
     CRGB previousColor;
     int colorPosition;
+
+    int colorPosition2;
+    CRGB currentColor2;
+    CRGB previousColor2;
+
     float difficulty;
     float difficultyFactor;
     std::vector<int> catchArea = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -49,5 +46,7 @@ private:
     bool playerOnePressed;
     bool playerTwoPressed;
     bool playerThreePressed;
+
+    unsigned long delayTime = 125;
 
 };
