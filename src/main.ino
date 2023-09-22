@@ -5,6 +5,7 @@
 #include "Level.hh"
 #include "defs.h"
 #include "errno.h"
+#include "newLevel.h"
 
 #define HARDWARE_INPUT
 
@@ -17,7 +18,7 @@ bool playerTwoMoved = false;
 bool playerThreeMoved = false;
 unsigned long lastTime = millis();
 
-LevelManager levelHandler = LevelManager();
+newLevel levelHandler = newLevel();
 
 
 enum direction {first, second, third};
@@ -31,6 +32,7 @@ void setup()
   pinMode(PIN_PLAYER_1, INPUT_PULLUP);
   pinMode(PIN_PLAYER_2, INPUT_PULLUP);
   pinMode(PIN_PLAYER_3, INPUT_PULLUP);
+
   // Serial.print("hello player one!\n");
   // leds[playerPosition] = COLOR_PLAYER_1;
   // leds[12] = CRGB::Blue;
@@ -124,84 +126,11 @@ void serialFlush() {
 }
 
 void loop() {
-  // if (Serial.available() > 0) {
-  // auto serialIn = Serial.read();
-  // if (serialIn == 'a') {
-  //   levelHandler.setPressed(1);
-  //   // for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_1; }
-  // }
-  // else if (serialIn == 's') {
-  //   levelHandler.setPressed(2);
-  //   // for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_2; }
-  // }
-  // else if (serialIn == 'd') {
-  //   levelHandler.setPressed(3);
-  //   // for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_PLAYER_3; }
-  // }
-  // else;
-  //   // for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_EMPTY; }
-  // }
-#ifdef HARDWARE_INPUT
   if (digitalRead(PIN_PLAYER_1) == LOW)
-     {levelHandler.setPressed(1); Serial.write("one"); Serial.write(std::to_string(errno).c_str()); }
+     {levelHandler.player[0] = true; }
   else if (digitalRead(PIN_PLAYER_2) == LOW)
-      {levelHandler.setPressed(2);  Serial.write("two"); }
+      {levelHandler.player[1] = true; }
    else if (digitalRead(PIN_PLAYER_3) == LOW)
-     { levelHandler.setPressed(3); Serial.write("three"); }
-#endif
-  // else
-  //   for (int i = 0; i < NUM_LEDS; i++) { leds[i] = COLOR_EMPTY; }
-  // mapMap();
-  FastLED.show();
-  if (levelHandler.speed() < 6)
-    delay(6);
-  else
-    delay(levelHandler.speed());
-  // unsigned long currTime = millis();
-  // if (currTime - lastTime > levelHandler.speed()) {
-  levelHandler.playAnimation(leds);
-  // lastTime = currTime;
-  // }
-  FastLED.show();
-  //serialFlush();
-  // while (Serial.available() > 0) {
-  //   int in = Serial.read();
-  //   // Serial.write(in);
-  //   mapMap();
-  //   FastLED.show();
-  //   switch (in) {
-  //   case ('a'):
-  //     if (playerOneMoved)
-  //       break;
-  //     move_player(first);
-  //     move_player(first);
-  //     move_player(first);
-  //     playerOneMoved = true;
-  //     levelHandler.setPlayer(1);
-  //     break;
-  //   case ('s'):
-  //     if (playerTwoMoved)
-  //       break;
-  //     move_player(second);
-  //     move_player(second);
-  //     move_player(second);
-  //     playerTwoMoved = true;
-  //     levelHandler.setPlayer(2);
-  //     break;
-  //   case ('d'):
-  //     if (playerThreeMoved)
-  //       break;
-  //     move_player(third);
-  //     move_player(third);
-  //     move_player(third);
-  //     playerThreeMoved = true;
-  //     levelHandler.setPlayer(3);
-  //     break;
-  //   }
-
-  //   yield();
-  //   levelHandler.callToAction();
-  //   yield();
-  // }
-  // todo  player timeout function
+     { levelHandler.player[2] = true; }
+  levelHandler.cycle(leds);
 }

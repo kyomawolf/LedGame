@@ -14,7 +14,7 @@
 #define COLOR_PLAYER_3    CRGB::Magenta
 #define COLOR_JUMP        CRGB::White
 #define COLOR_FIN         CRGB::Orange
-#define COLOR_RESET       CRGB::Coral
+#define COLOR_RESET       CRGB::Red
 #define COLOR_EMPTY       CRGB::Black
 #define COLOR_CATCH       CRGB::White
 #define DELAY_SHORT       60
